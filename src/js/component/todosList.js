@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from "react";
 import Input from "./input";
+import { Card, ListGroup, Button } from "react-bootstrap";
 
 export const TodosList = () => {
   const [inputV, setInputV] = useState("");
   const [todo, setTodos] = useState([{ label: "walk the dog", done: false }]);
 
   useEffect(() => {
-    fetch("https://assets.breatheco.de/apis/fake/todos/user/Luffy85q", {
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/Luffy85")
+      .then(resp => {
+        return resp.json();
+      })
+      .then(data => {
+        setTodos(data);
+      })
+      .catch(error => {
+        console.log(error);})
+        
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/Luffy85", {
       method: "POST",
-      body: JSON.stringify(todo),
+      body: JSON.stringify([]),
       headers: {
         "Content-Type": "application/json",
       },
@@ -20,6 +31,7 @@ export const TodosList = () => {
         return resp.json(); // (returns promise) will try to parse the result as json as return a promise that you can .then for results
       })
       .then((data) => {
+        // setTodos(data);
         console.log("este es un post")
         console.log(data); //this will print on the console the exact object received from the server
       })
@@ -36,31 +48,16 @@ export const TodosList = () => {
     setInputV(itemValue);
   }
 
-function getTasks () {
-  fetch('https://assets.breatheco.de/apis/fake/todos/user/Luffy850')
-  .then((resp) => {
-    console.log(resp.ok); // will be true if the response is successfull
-    console.log(resp.status); // the status code = 200 or code = 400 etc.
-    console.log(resp.text()); // will try return the exact result as string
-    return resp.json(); // (returns promise) will try to parse the result as json as return a promise that you can .then for results
-  })
-  .then((data) => {
-    console.log("este es un get")
-    console.log(data); //this will print on the console the exact object received from the server
-  })
-  .catch(error => {
-      //error handling
-      console.log(error);
-  })
-}
+
   function addNewTask(e) {
+    
     if (e.key === "Enter" && inputV != "") {
       const task = {
         label: inputV,
         done: false,
       };
-      
-      setTodos([...todo, task]);
+      let newTodos = [...todo, task];
+      setTodos(newTodos);
       setInputV("");
       console.log(todo)
       fetch("https://assets.breatheco.de/apis/fake/todos/user/Luffy850", {
@@ -72,16 +69,14 @@ function getTasks () {
       })
         .then((resp) => {
           console.log("este es un put")
-          return resp.json();
-          
-          // (returns promise) will try to parse the result as json as return a promise that you can .then for results
+          return resp.json();  
         })
-        // .then((data) => {
-        //   setTodos(data); 
-        // })
-        // .catch((error) => {
-        //   console.log(error)
-        // });
+        .then((data) => {
+          console.log(data); 
+        })
+        .catch((error) => {
+          console.log(error)
+        });
     }
   }
 
@@ -134,12 +129,15 @@ function getTasks () {
   };
 
   return (
-    <div className="container bg-secondary  bg-opacity-10  p-5">
-      <h1>To do List :</h1>
-      <div className="Container mt-5 p-1 align-items-center">
-        <div className="card border border-success">
+    <>
+    <Card className="bg-dark text-white text-center">
+      <Card.Img src="https://getwallpapers.com/wallpaper/full/b/4/0/393582.jpg" alt="Card image" />
+      <Card.ImgOverlay>
+        <Card.Title><h1>To do List :</h1></Card.Title>
+        <Card.Body style={{ width: '30rem' }} className="bg-dark opacity-75 border border-1 position-fixed top-50 start-50 translate-middle">
+        <ListGroup variant="flush">
           <div className="input-group mb-3">
-            <span className="input-group-text border-bottom border-success">
+            <span className="input-group-text outline-secondary">
               Tasks
             </span>
             <input
@@ -150,34 +148,39 @@ function getTasks () {
               value={inputV}
             />
           </div>
-
-          <ul className="list-group">
-            {todo.map((tarea, index) => (
+            <ListGroup.Item>  {todo.map((tarea, index) => (
               <Input
                 key={index}
                 id={index}
                 tarea={tarea.label}
                 onDelete={deleteTask}
               />
-            ))}
-          </ul>
-        </div>
+            ))}</ListGroup.Item>
+ 
+        </ListGroup>
+        <Card.Text>        <div className="flex">
+{todo.length === 0
+  ? "No tasks, add a task"
+  : `Number of Tasks: ${todo.length}`}
+</div></Card.Text>
+        <Button variant="btn btn-outline-danger" onClick={() => clearTodos()}>Delete Set List</Button>
 
-        <div className="flex">
-          {todo.length === 0
-            ? "No tasks, add a task"
-            : `Number of Tasks: ${todo.length}`}
-        </div>
-      </div>
+        </Card.Body>
 
-      <button
-        className="btn btn-outline-danger m-4"
-        onClick={() => clearTodos()}
-      >
-        Delete Set List
-      </button>
-    </div>
+      </Card.ImgOverlay>
+      <Card.Footer className = "d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+          <small className="text-muted">© 2022 Company, Inc</small>
+        </Card.Footer>
+    </Card>
+
+    </>
   );
 };
 
 export default TodosList;
+
+
+
+
+
+

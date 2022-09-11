@@ -4,7 +4,7 @@ export default function fetch() {
     useEffect(() => {
     fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr', {
       method: "PUT",
-      body: JSON.stringify(todos),
+      body: JSON.stringify([]),
       headers: {
         "Content-Type": "application/json"
       }
